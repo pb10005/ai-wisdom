@@ -12,6 +12,7 @@ skill として配布するためのリポジトリ。
 | パス | 役割 |
 | --- | --- |
 | `essays/YYYY/YYYY-MM-DD-<slug>.md` | エッセイ本体（一次資料）。frontmatter 付き Markdown |
+| `essays/YYYY/assets/<エッセイ名>/` | 取り込んだ原本（PDF など）と図 |
 | `essays/_template.md` | エッセイのテンプレート |
 | `skills/ai-wisdom/SKILL.md` | エージェントが読み込む知恵 skill の入口（索引） |
 | `skills/ai-wisdom/references/<theme>.md` | テーマ別の知恵カード |
@@ -29,6 +30,10 @@ Claude Code 上なら「このエッセイを知恵袋に追加して」と頼�
 テンプレートに沿って保存する。
 
 新しいエッセイの frontmatter は `extracted: false` にしておく。
+
+PDF で渡す場合も「この PDF を知恵袋に取り込んで」と頼めばよい。`add-essay` skill が
+原本と図を `assets/` に保存し、ページ画像と照合しながら Markdown に起こす。
+元が Claude Docs などの文書なら、Markdown で書き出して渡すと最も劣化が少ない。
 
 ### 2. 知恵を抽出する
 

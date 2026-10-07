@@ -112,6 +112,14 @@ def check() -> list[str]:
             errors.append(f"{rel(path)}: wisdom はリストにする")
         if meta.get("wisdom") and meta.get("extracted") is False:
             errors.append(f"{rel(path)}: wisdom があるのに extracted: false")
+        local = LINK.findall(path.read_text(encoding="utf-8"))
+        if isinstance(meta.get("source"), str):
+            local.append(meta["source"])
+        for link in local:
+            if "://" in link or link.startswith("#"):
+                continue
+            if not (path.parent / link.split("#", 1)[0]).exists():
+                errors.append(f"{rel(path)}: リンク先のファイルがない: {link}")
 
     # 知恵カード
     cards = parse_cards()
