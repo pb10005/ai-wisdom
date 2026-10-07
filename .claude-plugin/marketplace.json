@@ -1,0 +1,13 @@
+{
+  "name": "ai-wisdom",
+  "owner": {
+    "name": "pb10005"
+  },
+  "plugins": [
+    {
+      "name": "ai-wisdom",
+      "source": "./",
+      "description": "人間と AI が共同で書いたエッセイから抽出した行動指針（知恵）集"
+    }
+  ]
+}
