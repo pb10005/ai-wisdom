@@ -4,8 +4,8 @@ date: 2026-10-07
 tags: [戦略, 努力, 意思決定]
 collaborators: [Kohei, claude]
 source: https://claude.ai/artifact/HKweuZzwnLzAUEZEqn6Sx6
-extracted: false
-wisdom: []
+extracted: true
+wisdom: [W-0007, W-0008, W-0009, W-0010]
 ---
 
 # 努力の前に、ゲームを選べ

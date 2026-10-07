@@ -4,8 +4,8 @@ date: 2026-10-07
 tags: [競争観, コミュニケーション, 戦略, 成果関数]
 collaborators: [Kohei, claude]
 source: assets/2026-10-07-quantity-vs-combination/original.pdf
-extracted: false
-wisdom: []
+extracted: true
+wisdom: [W-0004, W-0005, W-0006]
 ---
 
 # 量で競う人、組み合わせで競う人 ― 経験が形づくる競争観とその摩擦

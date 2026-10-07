@@ -4,8 +4,8 @@ date: 2026-10-07
 tags: [制約, ボトルネック, 問題解決, 思考実験]
 collaborators: [Kohei, claude]
 source: assets/2026-10-07-paper-folding-to-moon/original.pdf
-extracted: false
-wisdom: []
+extracted: true
+wisdom: [W-0001, W-0002, W-0003]
 ---
 
 # 「紙を42回折ると月に届く」の制約を外していくと、宇宙エレベーターに行き着く

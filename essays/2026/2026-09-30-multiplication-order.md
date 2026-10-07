@@ -4,8 +4,8 @@ date: 2026-09-30
 tags: [表記, 算数教育, 評価]
 collaborators: [Kohei, claude]
 source: https://claude.ai/artifact/UBtvooZ9dYaKJmgaBKJahe
-extracted: false
-wisdom: []
+extracted: true
+wisdom: [W-0015, W-0016]
 ---
 
 # 「かけ算の順序問題」の真犯人は「×」だった——交換法則が成り立つのに小学校の算数で 4×3 がバツになる本当の理由

@@ -4,8 +4,8 @@ date: 2026-10-07
 tags: [ミクロとマクロ, 合成の誤謬, 統計, 問題解決]
 collaborators: [Kohei, claude]
 source: https://claude.ai/artifact/9gFFT4F9UvaHsv2CA8N7ai
-extracted: false
-wisdom: []
+extracted: true
+wisdom: [W-0011, W-0012, W-0013]
 ---
 
 # ミクロとマクロをつなぐリテラシー

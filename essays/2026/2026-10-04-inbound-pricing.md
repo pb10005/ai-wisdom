@@ -4,8 +4,8 @@ date: 2026-10-04
 tags: [価格, 公正, 視点の非対称]
 collaborators: [Kohei, claude]
 source: https://claude.ai/artifact/RSdJQB6nuL3CbZLdrvo4gr
-extracted: false
-wisdom: []
+extracted: true
+wisdom: [W-0014]
 ---
 
 # 民泊の「インバウンド価格」と、海外の「ぼったくり」は何が違うのか
