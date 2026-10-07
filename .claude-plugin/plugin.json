@@ -1,0 +1,9 @@
+{
+  "name": "ai-wisdom",
+  "description": "人間と AI が共同で書いたエッセイから抽出した行動指針（知恵）集",
+  "version": "0.1.0",
+  "author": {
+    "name": "pb10005"
+  },
+  "repository": "https://github.com/pb10005/ai-wisdom"
+}
