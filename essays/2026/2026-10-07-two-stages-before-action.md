@@ -4,8 +4,8 @@ date: 2026-10-07
 tags: [問題解決, 原因分析, 応急処置]
 collaborators: [Kohei, claude]
 source: https://claude.ai/artifact/Jv34WhaNsR1pWho2UHoRRi
-extracted: false
-wisdom: []
+extracted: true
+wisdom: [W-0017, W-0018, W-0019, W-0020]
 ---
 
 # 対処の前に、二つの段階がある

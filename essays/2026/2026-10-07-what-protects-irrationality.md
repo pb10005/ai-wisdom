@@ -4,8 +4,8 @@ date: 2026-10-07
 tags: [組織, 不合理, 阻害要因]
 collaborators: [Kohei, claude]
 source: https://claude.ai/artifact/U548yj971XryMoof9jncCh
-extracted: false
-wisdom: []
+extracted: true
+wisdom: [W-0021, W-0022]
 ---
 
 # 不合理はなぜ残り、合理はなぜ根付かないのか
