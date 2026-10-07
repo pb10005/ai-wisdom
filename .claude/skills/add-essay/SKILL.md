@@ -9,7 +9,8 @@ description: AI と書いたエッセイを知恵袋リポジトリの essays/ �
 
 1. **本文を確定する**
    - ユーザーが本文を貼った場合はそれを使う。会話からまとめる場合は、下書きを見せて確認を取ってから保存する。
-   - PDF などのファイルで渡された場合は、下の「ファイルから取り込む」に従って Markdown に起こす。
+   - Claude Docs の文書を指定された場合は、下の「Claude Docs から取り込む」に従う。
+   - PDF などのファイルで渡された場合は、下の「ファイルから取り込む（PDF）」に従って Markdown に起こす。
    - 本文の主張は書き換えない。整えるのは見出し・誤字・段落程度に留める。
 
 2. **メタデータを決める**
@@ -17,7 +18,7 @@ description: AI と書いたエッセイを知恵袋リポジトリの essays/ �
    - `date`: 執筆日（不明なら今日）。`YYYY-MM-DD`。
    - `tags`: 2〜5 個。既存エッセイのタグを `grep -h '^tags:' essays/**/*.md` で確認し、なるべく再利用する。
    - `collaborators`: 共同執筆者（例: `[human, claude]`）。ファイルの署名（`@名前` など）があればそれを使う。
-   - `source`: ファイルから取り込んだ場合のみ、原本へのエッセイからの相対パス。
+   - `source`: 取り込んだ場合のみ。PDF なら原本へのエッセイからの相対パス、Claude Docs なら文書の URL。
    - `extracted: false`、`wisdom: []` で固定。
 
 3. **ファイルを作る**
@@ -29,10 +30,27 @@ description: AI と書いたエッセイを知恵袋リポジトリの essays/ �
 
 5. **報告する**: 保存したパスを伝え、続けて知恵を抽出するか（`extract-wisdom`）をユーザーに尋ねる。
 
+## Claude Docs から取り込む
+
+PDF より劣化が少ないので、元が Claude Docs ならこちらを使う。
+
+1. **対象を特定する**: 文書のリンクがなければ Artifact の一覧（`list`）からタイトルで候補を挙げ、どれを取り込むかユーザーに選んでもらう。リンクの末尾が文書 ID。
+2. **タブを調べる**: Claude Docs の `read`（`ref: {"object":"project","id":"<文書 ID>"}`）で `files[].id`（タブ ID）と `files[].content.id`（本文ノード ID）を得る。
+3. **Markdown で書き出す**: `export`（`container: {"kind":"project","id":"<文書 ID>"}`, `file: <タブ ID>`, `format: "markdown"`）。結果は `data.bytes_b64`（base64）と `data.bytes`（バイト数）で返る。
+4. **base64 をファイルに書き、取り込む**: `bytes_b64` を一字一句そのままスクラッチパッドのファイルに書き、
+   `python3 scripts/import_docs.py <b64 ファイル> --bytes <data.bytes> --slug <slug> --tags <タグ> --source <文書の URL>` を実行する。
+   デコード後のバイト数と UTF-8 を検証し、frontmatter（title・date・collaborators は文書の見出しと署名から）を付けて保存する。
+   エラーになったら写し間違いなので、書き出しからやり直す。
+5. **落ちた図を戻す**: `export` は図（widget）を `&#91;embedded content: キャプション\]` に置き換える。スクリプトが WARN で場所を示すので、
+   - 本文の outline（`read` に `payload: {"projection":"outline"}`）から `<embed caption=... ref='node/<id>'>` を探し、
+   - その node を `read` して得られる JSX のコードを、`var(--cds-…)` を固定色に置き換えた静的 SVG に書き直して `essays/<YYYY>/assets/<エッセイ名>/fig-N.svg` に保存し、
+   - Playwright などで描画して元の図と見比べ、
+   - プレースホルダーを `![キャプション](assets/<エッセイ名>/fig-N.svg)` と `> **図の内容**:` の説明に置き換える。
+6. 本文を通読し、文字化けや欠落がないか確かめる。
+
 ## ファイルから取り込む（PDF）
 
-元が Claude Docs や Notion などの文書なら、まず Markdown で書き出してもらうのが最も劣化が少ない。
-PDF しかない場合は次の手順で起こす。機械変換の結果をそのまま保存しない。
+元が Claude Docs なら上の手順を使う。PDF しかない場合は次の手順で起こす。機械変換の結果をそのまま保存しない。
 
 1. **原本と図を保存する**
    - 原本: `essays/<YYYY>/assets/<エッセイの .md と同じ名前（拡張子なし）>/original.pdf`

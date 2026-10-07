@@ -35,6 +35,8 @@ def parse_value(raw: str):
         return [v.strip() for v in raw[1:-1].split(",") if v.strip()]
     if raw in ("true", "false"):
         return raw == "true"
+    if len(raw) >= 2 and raw[0] == raw[-1] == '"':
+        return raw[1:-1]
     return raw
 
 

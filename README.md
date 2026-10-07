@@ -20,6 +20,7 @@ skill として配布するためのリポジトリ。
 | `.claude/skills/extract-wisdom/` | エッセイから知恵を抽出するワークフロー skill（このリポジトリ作業用） |
 | `.claude-plugin/` | このリポジトリを Claude Code プラグインとして配布するための定義 |
 | `scripts/check.py` | エッセイと知恵カードの整合性チェック |
+| `scripts/import_docs.py` | Claude Docs の Markdown 書き出しをエッセイとして保存 |
 
 ## ワークフロー
 
@@ -31,9 +32,11 @@ Claude Code 上なら「このエッセイを知恵袋に追加して」と頼�
 
 新しいエッセイの frontmatter は `extracted: false` にしておく。
 
-PDF で渡す場合も「この PDF を知恵袋に取り込んで」と頼めばよい。`add-essay` skill が
-原本と図を `assets/` に保存し、ページ画像と照合しながら Markdown に起こす。
-元が Claude Docs などの文書なら、Markdown で書き出して渡すと最も劣化が少ない。
+Claude Docs で書いたエッセイは「Claude Docs の〇〇を知恵袋に取り込んで」と頼めばよい。
+`add-essay` skill が文書を Markdown で書き出し、`scripts/import_docs.py` で検証・保存し、図を SVG に起こして戻す。
+
+PDF で渡す場合も「この PDF を知恵袋に取り込んで」と頼めばよい。原本と図を `assets/` に保存し、
+ページ画像と照合しながら Markdown に起こす（Claude Docs からの取り込みより手間がかかり、劣化しやすい）。
 
 ### 2. 知恵を抽出する
 
