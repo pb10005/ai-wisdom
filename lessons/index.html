@@ -1,0 +1,200 @@
+<title>教訓かるた</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* 配置: かるたの取り札を並べた卓。札の表は縦書きの格言、選ぶと寓話・教訓・問いを開く */
+:root {
+  --paper: #e9ece8;      /* 卓（灰がかった和紙） */
+  --card: #fbfbf8;       /* 札 */
+  --ink: #1d2733;        /* 本文の墨 */
+  --muted: #5d6874;      /* 添え書き */
+  --ai: #24466e;         /* 藍：札の縁と見出し */
+  --shu: #b8432c;        /* 朱：判と強調 */
+  --line: #cfd5d2;
+  --veil: rgba(29, 39, 51, .45);
+  --display: "Shippori Mincho B1", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  --body: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #12171e; --card: #1b222c; --ink: #e5e8ec; --muted: #9aa6b2;
+    --ai: #9db7da; --shu: #e1765f; --line: #2c3540; --veil: rgba(0, 0, 0, .6); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #12171e; --card: #1b222c; --ink: #e5e8ec; --muted: #9aa6b2;
+  --ai: #9db7da; --shu: #e1765f; --line: #2c3540; --veil: rgba(0, 0, 0, .6); color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.8; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-inline: 16px; padding-block: 40px 64px; }
+header { display: grid; gap: 12px; margin-bottom: 28px; }
+h1 { font-family: var(--display); font-weight: 800; font-size: clamp(34px, 6vw, 52px); line-height: 1.15; margin: 0; letter-spacing: .06em; color: var(--ai); }
+h1 .seal { display: inline-grid; place-items: center; width: 1.05em; height: 1.05em; margin-left: .25em; border: 3px solid var(--shu); border-radius: 6px; color: var(--shu); font-size: .5em; vertical-align: .55em; letter-spacing: 0; transform: rotate(-6deg); }
+.lead { margin: 0; max-width: 62ch; color: var(--muted); }
+.bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 24px; }
+.chip, .draw { font: 500 14px/1 var(--body); border-radius: 999px; padding: 9px 16px; cursor: pointer; border: 1px solid var(--line); background: var(--card); color: var(--ink); }
+.chip[aria-pressed="true"] { background: var(--ai); border-color: var(--ai); color: var(--card); }
+.draw { margin-left: auto; border-color: var(--shu); color: var(--shu); background: transparent; }
+.chip:focus-visible, .draw:focus-visible, .card:focus-visible, .close:focus-visible, .nav button:focus-visible { outline: 3px solid var(--shu); outline-offset: 2px; }
+.count { font: 500 12px var(--mono); color: var(--muted); letter-spacing: .04em; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 18px; }
+.card { position: relative; display: grid; grid-template-rows: auto 1fr auto; gap: 10px; min-height: 300px; padding: 14px; text-align: left; cursor: pointer;
+  background: var(--card); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; box-shadow: inset 0 0 0 5px var(--card), inset 0 0 0 6px var(--ai); font: inherit; transition: transform .15s ease; }
+.card:hover { transform: translateY(-3px); }
+.card .top { display: flex; justify-content: space-between; align-items: flex-start; padding: 4px 6px 0; }
+.kana { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--shu); color: var(--card); font: 700 21px/1 var(--display); }
+.id { font: 500 11px var(--mono); color: var(--muted); letter-spacing: .05em; }
+.maxim { writing-mode: vertical-rl; font: 700 21px/1.6 var(--display); letter-spacing: .08em; justify-self: center; max-height: 230px; color: var(--ink); text-wrap: balance; }
+.card .foot { display: flex; justify-content: space-between; gap: 8px; padding: 0 6px 4px; font-size: 12px; color: var(--muted); }
+.card .foot b { font-weight: 500; color: var(--ai); white-space: nowrap; }
+.card .foot span { text-align: right; }
+.veil { position: fixed; inset: 0; background: var(--veil); display: grid; place-items: center; padding: 16px; z-index: 10; }
+.sheet { position: relative; width: min(720px, 100%); max-height: calc(100% - 32px); overflow-y: auto; background: var(--card); color: var(--ink); border-radius: 8px; padding: 32px clamp(20px, 5vw, 48px); box-shadow: inset 0 0 0 6px var(--card), inset 0 0 0 7px var(--ai); }
+.close { position: absolute; top: 14px; right: 14px; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); background: var(--card); color: var(--ink); font-size: 20px; line-height: 1; cursor: pointer; }
+.sheet .meta { font: 500 12px var(--mono); color: var(--muted); letter-spacing: .05em; margin: 0 0 6px; }
+.sheet h2 { font: 800 clamp(24px, 4vw, 32px)/1.4 var(--display); margin: 0 0 24px; color: var(--ai); text-wrap: balance; }
+.sheet h3 { font: 700 13px var(--body); letter-spacing: .12em; color: var(--muted); margin: 0 0 8px; }
+.fable { margin: 0 0 28px; padding: 18px 22px; border-left: 3px solid var(--line); }
+.fable h4 { font: 700 18px var(--display); margin: 0 0 10px; }
+.fable p { margin: 0 0 .6em; max-width: 60ch; }
+.lesson { display: grid; grid-template-columns: auto 1fr; gap: 16px; align-items: start; margin: 0 0 28px; }
+.lesson .stamp { display: grid; place-items: center; width: 52px; height: 52px; border: 2px solid var(--shu); border-radius: 6px; color: var(--shu); font: 800 15px/1.1 var(--display); text-align: center; transform: rotate(-4deg); }
+.lesson p { margin: 0; font-weight: 500; min-width: 0; }
+.questions { margin: 0 0 28px; padding: 0; list-style: none; display: grid; gap: 8px; }
+.questions li { padding: 10px 14px; border: 1px dashed var(--line); border-radius: 6px; }
+.questions li::before { content: "問 "; color: var(--shu); font-family: var(--display); font-weight: 800; }
+.source { font-size: 13px; color: var(--muted); margin: 0 0 20px; }
+.source a { color: var(--ai); }
+.nav { display: flex; justify-content: space-between; gap: 8px; border-top: 1px solid var(--line); padding-top: 16px; }
+.nav button { font: 500 14px var(--body); background: none; border: 0; color: var(--ai); cursor: pointer; padding: 6px 0; }
+.note { margin-top: 40px; font-size: 13px; color: var(--muted); max-width: 70ch; }
+@media (max-width: 480px) {
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .card { min-height: 250px; }
+  .maxim { font-size: 17px; max-height: 190px; }
+  .draw { margin-left: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .card { transition: none; } .card:hover { transform: none; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>教訓かるた<span class="seal" aria-hidden="true">知</span></h1>
+    <p class="lead">人と AI が一緒に書いたエッセイから取り出した知恵を、格言・寓話・問いの札にしました。札を選ぶと、短い寓話と、明日の自分に投げかける問いが開きます。</p>
+  </header>
+  <div class="bar" role="toolbar" aria-label="札の絞り込み">
+    <div id="chips" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+    <span class="count" id="count">22 枚</span>
+    <button class="draw" id="draw" type="button">一枚引く</button>
+  </div>
+  <div class="grid" id="grid"></div>
+  <noscript><ul><li>W-0001 壁は、いちばん手前のものから数える</li><li>W-0002 やり方の壁は道具を替え、目的の壁は向きを替える</li><li>W-0003 消えた荷物は、別の棚に移っただけかもしれない</li><li>W-0011 村の病に一軒の薬、一軒の病に村の薬</li><li>W-0013 一人の正解を、全員でやったらどうなるか</li><li>W-0017 どうするかの前に、何が起きているか</li><li>W-0018 最初に浮かんだ答えは、まだ仮説</li><li>W-0019 火を消したら、火元を探せ</li><li>W-0021 消えない無駄の陰には、それを守る何かがいる</li><li>W-0006 当たりは運でも、くじを引く回数は選べる</li><li>W-0007 走る前に、得点板を見よ</li><li>W-0009 降りることも、指し手の一つ</li><li>W-0010 何をやらないかを決めた人が、何かをやり遂げる</li><li>W-0004 終わる仕事と見つける仕事は、測り方が違う</li><li>W-0005 「わかった」の意味は、人の数だけある</li><li>W-0020 「早すぎる」より、「なぜ効くと思う？」</li><li>W-0008 天気を読むことは、雨を好むことではない</li><li>W-0012 平均点の教室に、平均点の生徒はいない</li><li>W-0014 立場を入れ替えても、同じ物差しを使う</li><li>W-0015 人を責める前に、書式を疑え</li><li>W-0016 形をなぞれる試験では、わかっているかは測れない</li><li>W-0022 壊す前に、なぜそこにあるのかを知る</li></ul></noscript>
+  <p class="note">寓話は教訓を伝えるための創作で、出典のエッセイに登場する話ではありません。教訓と問いは、出典のエッセイの主張に沿って書いています。札の番号（W-0001 など）は、AI エージェント向けの知恵 skill のカード番号と対応しています。</p>
+</div>
+
+<div class="veil" id="veil" hidden>
+  <article class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="s-title">
+    <button class="close" id="close" type="button" aria-label="閉じる">×</button>
+    <p class="meta" id="s-meta"></p>
+    <h2 id="s-title"></h2>
+    <section class="fable"><h3>寓話</h3><h4 id="s-fable-title"></h4><div id="s-fable"></div></section>
+    <div class="lesson"><span class="stamp" aria-hidden="true">教<br>訓</span><p id="s-lesson"></p></div>
+    <h3>自分に問う</h3>
+    <ul class="questions" id="s-questions"></ul>
+    <p class="source" id="s-source"></p>
+    <div class="nav"><button type="button" id="prev">← 前の札</button><button type="button" id="next">次の札 →</button></div>
+  </article>
+</div>
+
+<script>
+const ITEMS = [{"id":"W-0001","maxim":"壁は、いちばん手前のものから数える","theme":"問題解決","fable_title":"井戸掘りと三つの壁","fable":["村の若者が深い井戸を掘ろうとした。長老は三つの心配を口にした。「硬い岩盤が出るぞ。水が湧いて掘れなくなるぞ。縄が足りなくなるぞ」。","若者はいちばん恐ろしい岩盤に備えて、のみを何本も研いだ。ところが十尺掘ったところで縄が尽きた。岩盤は三十尺、水は二十尺の深さにあった。","次の年、若者は掘り始める前に、それぞれの壁が何尺で現れるかを書き出した。"],"lesson":"限界を決めるのは、いちばん恐ろしい壁ではなく、いちばん手前の壁。候補を数字で並べてから手を打つ。一つ越えれば、次の壁が現れる。","questions":["頭打ちの原因になりそうなものを、効き始める数字で並べられるか。","いまの壁を越えたら、次に来るのはどの壁か。"],"source":{"title":"「紙を42回折ると月に届く」の制約を外していくと、宇宙エレベーターに行き着く","url":"https://github.com/pb10005/ai-wisdom/blob/main/essays/2026/2026-10-07-paper-folding-to-moon.md"}},{"id":"W-0002","maxim":"やり方の壁は道具を替え、目的の壁は向きを替える","theme":"問題解決","fable_title":"泥の川と荷車","fable":["商人が荷車で川を渡ろうとして、車輪が泥にはまった。車輪を太くし、牛を増やしたが、少しずつしか進まない。","渡し守が言った。「泥は荷車の壁だ。舟に積めば泥はない。だが荷の重さは、舟でも消えない」。","商人は荷を舟に移した。それでも重すぎる分は、こちらから押すのをやめ、向こう岸の村人に綱で引いてもらった。"],"lesson":"壁が選んだやり方に付いてくるものなら、やり方を替えれば消える。目的そのものに付いた壁は消えないので、改良を重ねるより、問題の向きを反転できないかを考える。","questions":["その壁は、やり方を変えても残るか。","「こちらから押す」を「向こうから引く」に変えられないか。"],"source":{"title":"「紙を42回折ると月に届く」の制約を外していくと、宇宙エレベーターに行き着く","url":"https://github.com/pb10005/ai-wisdom/blob/main/essays/2026/2026-10-07-paper-folding-to-moon.md"}},{"id":"W-0003","maxim":"消えた荷物は、別の棚に移っただけかもしれない","theme":"問題解決","fable_title":"押し入れの片づけ","fable":["部屋が物であふれた男は、床の物をすべて押し入れに詰め込んだ。床は広くなり、男は満足した。","だが押し入れの戸は閉まらなくなり、探し物は二度と見つからなくなった。","押し入れの整理術を考え続けるうちに、男は、本当は友人を招ける部屋にしたかったことを忘れていた。"],"lesson":"問題が消えたように見えたら、解いたのか、別の場所に移しただけかを確かめる。手を打つたびに、その解がまだ最初の目的を満たしているかを見直す。","questions":["減ったはずの負担は、どこへ行ったか。","最初に何を叶えたかったのか、いま言えるか。"],"source":{"title":"「紙を42回折ると月に届く」の制約を外していくと、宇宙エレベーターに行き着く","url":"https://github.com/pb10005/ai-wisdom/blob/main/essays/2026/2026-10-07-paper-folding-to-moon.md"}},{"id":"W-0011","maxim":"村の病に一軒の薬、一軒の病に村の薬","theme":"問題解決","fable_title":"涸れかけた井戸と雨漏り","fable":["日照りで村の井戸が涸れかけた。村長は家々に「節水の心がけが足りない」と張り紙をした。だが原因は、上流の堰が壊れていたことだった。","隣の村では、一軒の家の雨漏りを直すために、村じゅうの屋根を葺き替える計画が立てられた。工事は冬に間に合わず、村じゅうが寒さに震えた。"],"lesson":"問題が起きている大きさ（一人か全体か、一般論か個別の事情か）と、打ち手の大きさを合わせる。ただし、何でも仕組みのせいにして自分たちにできる工夫を探さないのも、同じ種類の誤りである。","questions":["いま話しているのは一人の話か、全体の話か。","その定石は、この現場の前提でも成り立つか。"],"source":{"title":"ミクロとマクロをつなぐリテラシー","url":"https://github.com/pb10005/ai-wisdom/blob/main/essays/2026/2026-10-07-micro-macro-literacy.md"}},{"id":"W-0013","maxim":"一人の正解を、全員でやったらどうなるか","theme":"問題解決","fable_title":"芝居小屋の客","fable":["芝居小屋で、前の客の頭で舞台が見えない男が立ち上がった。よく見えた。","それを見た後ろの客も立ち、その後ろも立った。やがて全員が立ち上がり、誰も前よりよく見えず、足だけが疲れた。","翌日、小屋の主人は客席に段差をつけた。"],"lesson":"一人にとっての正解は「全員が同じことをしたら」で、全体の方針は「目の前のこの人にとっては」で、もう一度確かめる。少しずつの変化が、ある一線で急に性質を変えることもある。","questions":["全員が同じことをしたら、どうなるか。","その平均や傾向は、目の前の一人にも当てはまるか。"],"source":{"title":"ミクロとマクロをつなぐリテラシー","url":"https://github.com/pb10005/ai-wisdom/blob/main/essays/2026/2026-10-07-micro-macro-literacy.md"}},{"id":"W-0017","maxim":"どうするかの前に、何が起きているか","theme":"問題解決","fable_title":"鳴かなくなった鶏","fable":["ある朝、農家の鶏が鳴かなくなった。息子は「病気だ、薬を買おう」と言い、娘は「狐だ、柵を高くしよう」と言った。","祖母は黙って小屋を見て回った。鳴かないのは東の小屋の鶏だけで、西の小屋の鶏は元気だった。","東の小屋だけ、三日前から餌の袋が新しいものに替わっていた。"],"lesson":"対策を考える前に、何が・いつから・どこで・どの程度起きているかを事実として捉える。報告に混ざった解釈と事実を分ける。起きていない場所が、いちばんの手がかりになる。","questions":["「どこでは起きていないか」を言えるか。","いま聞いた話のうち、事実はどれで、解釈はどれか。"],"source":{"title":"対処の前に、二つの段階がある","url":"https://github.com/pb10005/ai-wisdom/blob/main/essays/2026/2026-10-07-two-stages-before-action.md"}},{"id":"W-0018","maxim":"最初に浮かんだ答えは、まだ仮説","theme":"問題解決","fable_title":"熱を出した三人","fable":["熱を出した三人が医者を訪ねた。若い医者は三人とも同じ風邪と見て、同じ解熱剤を渡した。","二人は治った。一人は熱が下がったまま、日に日に弱っていった。","年老いた医者はその一人に、ほかの症状と最近の旅のことを尋ね、別の病だと見抜いた。「熱は答えではない。手がかりの一つだ」。"],"lesson":"目に見える事実は症状にすぎない。原因は仮説を立てて確かめ、絞り込む。もっともらしい説明が一つ見つかっても、そこで考えるのをやめない。経験は仮説を立てるのに役立つが、確かめる代わりにはならない。","questions":["ほかの原因でも説明できないか。","その原因が正しいなら、ほかに何が起きているはずか。それは本当に起きているか。"],"source":{"title":"対処の前に、二つの段階がある","url":"https://github.com/pb10005/ai-wisdom/blob/main/essays/2026/2026-10-07-two-stages-before-action.md"}},{"id":"W-0019","maxim":"火を消したら、火元を探せ","theme":"問題解決","fable_title":"二度燃えた納屋","fable":["納屋から煙が上がった。村人たちは桶を手渡しして火を消し、喜んで家に帰った。","ひと月後、同じ納屋がまた燃えた。今度は隣の家まで焼けた。","灰の中から、ねずみにかじられたランプの紐が見つかった。"],"lesson":"被害を止める応急処置は、原因を調べる前に打ってよい。だが応急処置で終わりにしない。何が起き、なぜ起きたかを確かめてから打つ対策だけが、問題を本当に終わらせる。","questions":["いま打った手は、止血か、治療か。","原因は、まだそこに残っていないか。"],"source":{"title":"対処の前に、二つの段階がある","url":"https://github.com/pb10005/ai-wisdom/blob/main/essays/2026/2026-10-07-two-stages-before-action.md"}},{"id":"W-0021","maxim":"消えない無駄の陰には、それを守る何かがいる","theme":"問題解決","fable_title":"開かずの門","fable":["公園の人々は、遠回りの石畳を使わず、芝生を斜めに横切った。芝生には踏み固めた近道ができた。人は放っておいても、楽な道を見つける。","ところが公園の隅の古い門だけは、誰もが不便だと言うのに、何十年も閉じたままだった。","若い管理人が調べると、鍵を持っているのは引退した前の管理人だけで、門を開けて何か起きれば、責めを負うのは今の管理人だった。"],"lesson":"無駄は放っておけば自然に削られ、楽になる工夫は自然に広まる。それでも残る無駄、生まれない工夫には、それを守る（阻む）何かがある。「なぜこんな無駄が」ではなく「何がこれを守っているのか」と問う。","questions":["やめたいと一番思っている人は、やめる権限を持っているか。","やめて何かが起きたら、誰が責められるか。"],"source":{"title":"不合理はなぜ残り、合理はなぜ根付かないのか","url":"https://github.com/pb10005/ai-wisdom/blob/main/essays/2026/2026-10-07-what-protects-irrationality.md"}},{"id":"W-0006","maxim":"当たりは運でも、くじを引く回数は選べる","theme":"戦略","fable_title":"泉を探す旅人","fable":["乾いた土地で、旅人たちが泉を探していた。ある者は一か所を深く掘り続けた。ある女は浅い穴をたくさん掘り、湿り気のある場所だけを深く掘った。","最初に泉を見つけたのは女だった。人が集まってくると、女は時間をかけて石垣を積み、泉を囲った。","何年かして新しい水路が引かれ、水が誰にでも手に入るようになると、女はまた浅い穴を掘りに出かけた。"],"lesson":"予測できない成果は、小さく多く試すことで量の問題に近づける。当たりを見つけたら、時間をかけないと積めないもので守る。守りが効かなくなったら、また探しに出る。","questions":["いまは探す時期か、守る時期か。","一度の失敗を責める仕組みが、試す回数を減らしていないか。"],"source":{"title":"量で競う人、組み合わせで競う人 ― 経験が形づくる競争観とその摩擦","url":"https://github.com/pb10005/ai-wisdom/blob/main/essays/2026/2026-10-07-quantity-vs-combination.md"}},{"id":"W-0007","maxim":"走る前に、得点板を見よ","theme":"戦略","fable_title":"いちばん速い若者","fable":["村祭りの競走で、若者は誰よりも速く走った。だが優勝したのは、途中で旗を三本拾った年寄りだった。","その競走は、速さではなく、拾った旗の数で勝ちが決まるものだった。","若者が決まりを読んだのは、祭りが終わってからだった。"],"lesson":"努力を積み増す前に、何をすれば勝ちか、誰が判定するか、実際に何が報われているかを確かめる。報われない努力の多くは、量ではなく向きの問題である。","questions":["いまの場で「勝ち」とは何か。それは自分の望む勝ちと同じか。","自分の努力のうち、得点板に載っているのはどれか。"],"source":{"title":"努力の前に、ゲームを選べ","url":"https://github.com/pb10005/ai-wisdom/blob/main/essays/2026/2026-10-07-choose-the-game.md"}},{"id":"W-0009","maxim":"降りることも、指し手の一つ","theme":"戦略","fable_title":"大きな魚屋の隣","fable":["小さな魚屋の隣に、大きな魚屋ができた。小さな魚屋は値段を下げ、朝も早く開けたが、客は減り続けた。","ある日、店主は、自分がさばく刺身だけは遠くから買いに来る客がいることに気づいた。","店主は魚を並べるのをやめ、刺身と仕出しの店に替えた。"],"lesson":"差が努力ではなく、元手や立場や先に始めた年数で決まっている場では、頑張っても結果はほとんど覆らない。自分の強みが相対的に生きる場所へ移るのは、負けではなく合理的な一手である。","questions":["上との差は、努力で埋まる差か、初期条件の差か。","自分の強みが一番生きる場所はどこか。"],"source":{"title":"努力の前に、ゲームを選べ","url":"https://github.com/pb10005/ai-wisdom/blob/main/essays/2026/2026-10-07-choose-the-game.md"}},{"id":"W-0010","maxim":"何をやらないかを決めた人が、何かをやり遂げる","theme":"戦略","fable_title":"十枚の畑","fable":["男は十枚の畑すべてに、毎日少しずつ水をまいた。どの畑も枯れはしなかったが、実りは乏しかった。","隣の女は三枚の畑だけを選び、残りは休ませた。","秋、女の三枚は、男の十枚より多く実った。"],"lesson":"時間も力も限られている。すべてに力を配れば、どこでも平凡な結果しか残らない。やることを増やす前に、やらないことを決める。","questions":["やめても結果が変わらないことは何か。","どう戦うかの前に、どこで何のために戦うかは合っているか。"],"source":{"title":"努力の前に、ゲームを選べ","url":"https://github.com/pb10005/ai-wisdom/blob/main/essays/2026/2026-10-07-choose-the-game.md"}},{"id":"W-0004","maxim":"終わる仕事と見つける仕事は、測り方が違う","theme":"協働","fable_title":"橋大工と鉱脈探し","fable":["橋大工は親方に毎日「今日で三割できました」と報告した。","同じ親方に雇われた鉱脈探しは、ひと月のあいだ「まだ何も出ません」としか言えず、怠けていると叱られた。","ある日、鉱脈探しは報告を変えた。「東の谷は掘り終え、鉱脈がないと分かりました。残るは北の谷と西の尾根です。十日後に、続けるかどうかを相談させてください」。親方は初めて、彼の仕事が進んでいることを知った。"],"lesson":"時間をかければ終わる仕事は「何割終わったか」で、探す仕事は「試したこと」と「消せた可能性」で進み具合を伝える。探す仕事には締切ではなく、続けるかどうかを決める日を置く。始める前に、どちらの仕事かを言葉にしてそろえておく。","questions":["この仕事は、終わる仕事か、見つける仕事か。","「いつ終わる？」を「いつ、続けるかを決める？」に置き換えられないか。"],"source":{"title":"量で競う人、組み合わせで競う人 ― 経験が形づくる競争観とその摩擦","url":"https://github.com/pb10005/ai-wisdom/blob/main/essays/2026/2026-10-07-quantity-vs-combination.md"}},{"id":"W-0005","maxim":"「わかった」の意味は、人の数だけある","theme":"協働","fable_title":"二人の弟子","fable":["師匠が「この百の型を覚えたか」と聞くと、二人の弟子はどちらも「わかりました」と答えた。","翌日、型を組み合わせた技を求められると、一人目はできず、二人目はできた。","師匠は一人目を嘘つきだと思った。だが一人目にとって「わかった」とは「覚えた」という意味で、彼は嘘をついていなかった。"],"lesson":"同じ言葉が、違う意味で使われていないかを疑う。違和感を相手の能力や姿勢のせいにする前に、どんな経験から来た前提の違いかを探す。","questions":["相手の言う「できた」「わかった」は、何ができる状態を指しているか。","相手を責めたくなったとき、前提の違いを言葉にできるか。"],"source":{"title":"量で競う人、組み合わせで競う人 ― 経験が形づくる競争観とその摩擦","url":"https://github.com/pb10005/ai-wisdom/blob/main/essays/2026/2026-10-07-quantity-vs-combination.md"}},{"id":"W-0020","maxim":"「早すぎる」より、「なぜ効くと思う？」","theme":"協働","fable_title":"電気の落ちる店","fable":["店の電気が何度も落ちた。店主は「新しいブレーカーを買ってくる」と走り出そうとした。","番頭は止めずに尋ねた。「それで直るとしたら、原因は何だとお考えですか」。店主は少し考えて言った。「冷蔵庫を増やしたせいかもしれん」。","番頭は答えた。「では三十分だけ、どの機械を動かしたときに落ちるか一緒に見ましょう。その間、冷蔵庫の中身は裏の氷室に移しておきます」。"],"lesson":"結論を急ぐ人の案を否定せず、案の裏にある原因の見立てを尋ねる。調べる時間は区切り、被害を止める手は並行して打つ。何をいつまでにやるかが見えれば、人は待てる。","questions":["相手の案の裏にある「原因の見立て」は何か。","調べることを、「何をいつまでに」の約束として示せるか。"],"source":{"title":"対処の前に、二つの段階がある","url":"https://github.com/pb10005/ai-wisdom/blob/main/essays/2026/2026-10-07-two-stages-before-action.md"}},{"id":"W-0008","maxim":"天気を読むことは、雨を好むことではない","theme":"判断と評価","fable_title":"売れない画家","fable":["ある画家は、良い絵なら必ず売れると信じていた。だがその町では、画商に気に入られた者の絵しか売れなかった。","画家は画商の好みを調べることを恥だと思い、売れないまま年を重ねた。","弟子の一人は、町の仕組みを落ち着いて調べた。そのうえで自分の描きたい絵を、それを好む別の町の画商に持っていった。"],"lesson":"「こうあるべき」と「実際にこうなっている」を分けて見る。仕組みを知ることは、それを正しいと認めることではない。知ったうえでなら、自分の価値観に沿う道を選べる。","questions":["いまの場で、実際に評価を決めている仕組みは何か。","それを知ったうえで、自分はどう振る舞いたいか。"],"source":{"title":"努力の前に、ゲームを選べ","url":"https://github.com/pb10005/ai-wisdom/blob/main/essays/2026/2026-10-07-choose-the-game.md"}},{"id":"W-0012","maxim":"平均点の教室に、平均点の生徒はいない","theme":"判断と評価","fable_title":"平均の椅子","fable":["王は兵士千人の体を測らせ、平均の寸法で椅子を作らせた。その椅子は、誰の体にも合わなかった。","次に、背丈がちょうど真ん中の兵士に合わせて作らせた。それでも、背の高い者と低い者が半々の隊では、やはり誰にも合わなかった。","最後に職人は、高さを変えられる椅子を作った。"],"lesson":"一つの数字で全体を代表させない。ばらつきや山の数を見て、分けても同じ結論になるかを確かめる。平均か中央値かは、何を知りたいかで選ぶ。","questions":["この数字は、何を捨ててまとめたものか。","分けてみても、同じ結論になるか。"],"source":{"title":"ミクロとマクロをつなぐリテラシー","url":"https://github.com/pb10005/ai-wisdom/blob/main/essays/2026/2026-10-07-micro-macro-literacy.md"}},{"id":"W-0014","maxim":"立場を入れ替えても、同じ物差しを使う","theme":"判断と評価","fable_title":"峠の茶屋","fable":["旅に出た男は、峠の茶屋の団子が町の倍の値段だと怒り、「ぼったくりだ」と言いふらした。","家に戻ると、男の茶店にも旅人が来るようになった。男は値段を倍にし、「旅人向けの値段だ」と言った。値段は店先に書き、町の者にも同じ値で売った。","そのとき男は、峠の茶屋の値段も店先に書いてあったことを思い出した。"],"lesson":"公正かどうかは、金額の高い安いではなく、前もって示されているか、相手によって変えていないか、選ぶ自由があるかで決まる。自分が払う側でも売る側でも、同じ物差しを使う。","questions":["値段や条件は、前もって示されていたか。","立場が逆なら、自分は同じ評価をするか。"],"source":{"title":"民泊の「インバウンド価格」と、海外の「ぼったくり」は何が違うのか","url":"https://github.com/pb10005/ai-wisdom/blob/main/essays/2026/2026-10-04-inbound-pricing.md"}},{"id":"W-0015","maxim":"人を責める前に、書式を疑え","theme":"判断と評価","fable_title":"右と左の帳簿","fable":["ある商家の帳簿には、品物を書く欄が左右に二つあった。どちらに書いても意味は同じだった。","新しい番頭は「左には仕入れ、右には売り物を書け」と決め、逆に書いた丁稚を叱った。丁稚たちは毎日、右か左かでもめた。","主人は帳簿を作り直し、欄を一つにした。もめごとは消えた。"],"lesson":"意味のない選択を毎回強いる形式があると、人はそこに意味を見いだしてルールを作り、争いが生まれる。不合理なルールを見たら、人を責める前に、形式が誘導していないかを探す。","questions":["争っている両側は、それぞれ正しいことを言っていないか。","その形式は、意味のない選択を強いていないか。"],"source":{"title":"「かけ算の順序問題」の真犯人は「×」だった——交換法則が成り立つのに小学校の算数で 4×3 がバツになる本当の理由","url":"https://github.com/pb10005/ai-wisdom/blob/main/essays/2026/2026-09-30-multiplication-order.md"}},{"id":"W-0016","maxim":"形をなぞれる試験では、わかっているかは測れない","theme":"判断と評価","fable_title":"品書きを写す見習い","fable":["料理屋の親方は、見習いに品書きを手本どおりの順で書かせ、順が合えば合格とした。","ある見習いは料理を何も知らないまま、順だけを覚えて合格した。別の見習いは、どの料理に何を使うかまで知っていたが、順を入れ替えて書いたために落とされた。","ある晩、客が品書きにない料理を頼んだ。作れたのは、落とされた見習いだった。"],"lesson":"わかっているかを確かめるなら、形をなぞるだけでは満たせない手がかりで判定する。その判定が、わかっていない人を通し、わかっている人を落としていないかも確かめる。","questions":["わかっていない人でも、たまたま通れてしまわないか。","わかっている人を、形だけを理由に落としていないか。"],"source":{"title":"「かけ算の順序問題」の真犯人は「×」だった——交換法則が成り立つのに小学校の算数で 4×3 がバツになる本当の理由","url":"https://github.com/pb10005/ai-wisdom/blob/main/essays/2026/2026-09-30-multiplication-order.md"}},{"id":"W-0022","maxim":"壊す前に、なぜそこにあるのかを知る","theme":"判断と評価","fable_title":"雑談だけの朝会","fable":["新しい課長は、毎朝の会議が中身のない雑談ばかりだと気づき、廃止した。","ひと月後、部署の誰も、ほかの人の困りごとを知らなくなった。小さな行き違いが、やがて大きな事故になった。","あの朝会は、部署で唯一、困りごとが自然に口にされる場だった。"],"lesson":"不合理に見えるものを取り除く前に、表向きとは別の役割を担っていないか、始まった理由を誰か知っているかを確かめる。役割が分かれば、それを別の形で満たしてから手放せる。","questions":["これが消えたら、困る人や寂しがる人はいないか。","なぜ始まったのか、誰か知っているか。"],"source":{"title":"不合理はなぜ残り、合理はなぜ根付かないのか","url":"https://github.com/pb10005/ai-wisdom/blob/main/essays/2026/2026-10-07-what-protects-irrationality.md"}}];
+const THEMES = ["問題解決", "戦略", "協働", "判断と評価"];
+const $ = (id) => document.getElementById(id);
+let filter = "すべて";
+let shown = ITEMS;
+let current = -1;
+let opener = null;
+
+function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+
+function renderChips() {
+  const box = $("chips"); box.textContent = "";
+  ["すべて", ...THEMES].forEach((t) => {
+    const b = el("button", "chip", t); b.type = "button";
+    b.setAttribute("aria-pressed", String(t === filter));
+    b.addEventListener("click", () => { filter = t; try { localStorage.setItem("karuta-filter", t); } catch (e) {} renderChips(); renderGrid(); });
+    box.append(b);
+  });
+}
+
+function renderGrid() {
+  shown = filter === "すべて" ? ITEMS : ITEMS.filter((i) => i.theme === filter);
+  $("count").textContent = shown.length + " 枚";
+  const grid = $("grid"); grid.textContent = "";
+  shown.forEach((item, idx) => {
+    const c = el("button", "card"); c.type = "button";
+    c.setAttribute("aria-label", item.id + " " + item.maxim);
+    const top = el("div", "top");
+    top.append(el("span", "kana", item.maxim.replace(/^[「『（]/, "").charAt(0)), el("span", "id", item.id));
+    const foot = el("div", "foot");
+    foot.append(el("b", null, item.theme), el("span", null, item.fable_title));
+    c.append(top, el("span", "maxim", item.maxim), foot);
+    c.addEventListener("click", () => { opener = c; openSheet(idx); });
+    grid.append(c);
+  });
+}
+
+function openSheet(idx) {
+  current = (idx + shown.length) % shown.length;
+  const item = shown[current];
+  $("s-meta").textContent = item.id + " ・ " + item.theme;
+  $("s-title").textContent = item.maxim;
+  $("s-fable-title").textContent = item.fable_title;
+  const fable = $("s-fable"); fable.textContent = "";
+  item.fable.forEach((p) => fable.append(el("p", null, p)));
+  $("s-lesson").textContent = item.lesson;
+  const q = $("s-questions"); q.textContent = "";
+  item.questions.forEach((t) => q.append(el("li", null, t)));
+  const src = $("s-source"); src.textContent = "";
+  if (item.source) {
+    src.append("出典: ");
+    const a = el("a", null, item.source.title); a.href = item.source.url; a.target = "_blank"; a.rel = "noopener";
+    src.append(a);
+  }
+  $("veil").hidden = false;
+  $("sheet").scrollTop = 0;
+  $("close").focus();
+  try { history.replaceState(null, "", "#" + item.id.toLowerCase()); } catch (e) {}
+}
+
+function closeSheet() {
+  $("veil").hidden = true;
+  try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {}
+  if (opener) opener.focus();
+}
+
+$("close").addEventListener("click", closeSheet);
+$("veil").addEventListener("click", (e) => { if (e.target === $("veil")) closeSheet(); });
+$("prev").addEventListener("click", () => openSheet(current - 1));
+$("next").addEventListener("click", () => openSheet(current + 1));
+$("draw").addEventListener("click", () => { opener = $("draw"); openSheet(Math.floor(Math.random() * shown.length)); });
+document.addEventListener("keydown", (e) => {
+  if ($("veil").hidden) return;
+  if (e.key === "Escape") closeSheet();
+  if (e.key === "ArrowRight") openSheet(current + 1);
+  if (e.key === "ArrowLeft") openSheet(current - 1);
+});
+
+try { const saved = localStorage.getItem("karuta-filter"); if (saved && (saved === "すべて" || THEMES.includes(saved))) filter = saved; } catch (e) {}
+renderChips();
+renderGrid();
+const hash = location.hash.slice(1).toUpperCase();
+if (hash && ITEMS.some((x) => x.id === hash)) {
+  if (!shown.some((x) => x.id === hash)) { filter = "すべて"; renderChips(); renderGrid(); }
+  openSheet(shown.findIndex((x) => x.id === hash));
+}
+</script>

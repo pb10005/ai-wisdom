@@ -20,6 +20,9 @@ ROOT = Path(__file__).resolve().parent.parent
 ESSAYS = ROOT / "essays"
 SKILL_DIR = ROOT / "skills" / "ai-wisdom"
 REFERENCES = SKILL_DIR / "references"
+LESSONS = ROOT / "lessons"
+LESSON_HEADING = re.compile(r"^### (W-\d{4}) (.+)$")
+LESSON_KEYS = ("寓話", "教訓", "問い", "出典")
 
 ESSAY_NAME = re.compile(r"^(\d{4})-(\d{2})-(\d{2})-[a-z0-9]+(?:-[a-z0-9]+)*\.md$")
 CARD_HEADING = re.compile(r"^### (W-\d{4}) (.+)$")
@@ -164,6 +167,35 @@ def check() -> list[str]:
     for card in cards:
         if card["id"] not in index:
             errors.append(f"skills/ai-wisdom/SKILL.md: 索引に {card['id']} がない")
+
+    # 人向けの教訓（lessons/）: 知恵カードと一対一で対応する
+    lesson_ids: dict[str, str] = {}
+    for path in sorted(LESSONS.glob("*.md")):
+        lid, fields = None, set()
+        lines = path.read_text(encoding="utf-8").splitlines() + ["### W-0000 end"]
+        for lineno, line in enumerate(lines, 1):
+            m = LESSON_HEADING.match(line)
+            if m:
+                if lid:
+                    for key in LESSON_KEYS:
+                        if key not in fields:
+                            errors.append(f"{rel(path)} {lid}: 「{key}」がない")
+                if m[1] == "W-0000":
+                    break
+                lid, fields = m[1], set()
+                if lid in lesson_ids:
+                    errors.append(f"{rel(path)}:{lineno} {lid}: 教訓が重複（{lesson_ids[lid]}）")
+                lesson_ids[lid] = rel(path)
+                continue
+            field = CARD_FIELD.match(line)
+            if lid and field:
+                fields.add(field[1].strip())
+    for card in cards:
+        if card["fields"].get("status") == "active" and card["id"] not in lesson_ids:
+            errors.append(f"lessons/: {card['id']} の教訓がない")
+    for lid, where in lesson_ids.items():
+        if lid not in seen:
+            errors.append(f"{where} {lid}: 対応する知恵カードがない")
 
     return errors
 

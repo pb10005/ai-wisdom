@@ -5,6 +5,7 @@ skill として配布するためのリポジトリ。
 
 ```
 エッセイ (essays/)  ──抽出──▶  知恵 skill (skills/ai-wisdom/)  ──読み込み──▶  AI エージェント
+                                  └──書き直し──▶  教訓かるた (lessons/)  ──▶  人
 ```
 
 ## ディレクトリ構成
@@ -16,11 +17,14 @@ skill として配布するためのリポジトリ。
 | `essays/_template.md` | エッセイのテンプレート |
 | `skills/ai-wisdom/SKILL.md` | エージェントが読み込む知恵 skill の入口（索引） |
 | `skills/ai-wisdom/references/<theme>.md` | テーマ別の知恵カード |
+| `lessons/<theme>.md` | 人が読むための教訓（格言・寓話・教訓・問い） |
+| `lessons/index.html` | 教訓をカード形式で読むページ（`scripts/build_lessons.py` で生成） |
 | `.claude/skills/add-essay/` | エッセイを保存するためのワークフロー skill（このリポジトリ作業用） |
 | `.claude/skills/extract-wisdom/` | エッセイから知恵を抽出するワークフロー skill（このリポジトリ作業用） |
 | `.claude-plugin/` | このリポジトリを Claude Code プラグインとして配布するための定義 |
 | `scripts/check.py` | エッセイと知恵カードの整合性チェック |
 | `scripts/import_docs.py` | Claude Docs の Markdown 書き出しをエッセイとして保存 |
+| `scripts/build_lessons.py` | 教訓の Markdown からカード形式のページを生成 |
 
 ## ワークフロー
 
@@ -46,6 +50,7 @@ PDF で渡す場合も「この PDF を知恵袋に取り込んで」と頼め�
 2. 再利用可能な原則（知恵）を取り出し、知恵カードの形式にする
 3. 既存カードと重複・矛盾がないか確認し、`skills/ai-wisdom/references/` に追記・統合する
 4. `SKILL.md` の索引を更新する
+5. 同じ番号の教訓（格言・寓話・教訓・問い）を `lessons/` に書き、`index.html` を作り直す
 5. エッセイの frontmatter を `extracted: true` にし、生まれた知恵の ID を記録する
 
 ### 3. 検証する
