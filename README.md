@@ -51,7 +51,7 @@ PDF で渡す場合も「この PDF を知恵袋に取り込んで」と頼め�
 3. 既存カードと重複・矛盾がないか確認し、`skills/ai-wisdom/references/` に追記・統合する
 4. `SKILL.md` の索引を更新する
 5. 同じ番号の教訓（格言・寓話・教訓・問い）を `lessons/` に書き、`index.html` を作り直す
-5. エッセイの frontmatter を `extracted: true` にし、生まれた知恵の ID を記録する
+6. エッセイの frontmatter を `extracted: true` にし、生まれた知恵の ID を記録する
 
 ### 3. 検証する
 
