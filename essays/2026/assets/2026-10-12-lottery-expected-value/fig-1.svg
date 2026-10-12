@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 268" role="img" aria-label="期待値の約−160円は、1枚買っても実際には出ない値" font-size="13" font-family="sans-serif">
+<rect width="760" height="268" fill="#ffffff"/>
+<text x="24" y="32" font-size="15" font-weight="600" fill="#1f1e1d">期待値の約−160円は、1枚買っても実際には出ない値</text>
+<text x="24" y="52" font-size="11.5" fill="#6b6a66">1枚300円を買ったときの収支（目盛りは等間隔ではない）</text>
+<g stroke="#9c9a92" stroke-width="1.25"><line x1="40" y1="160" x2="466" y2="160"/><line x1="494" y1="160" x2="720" y2="160"/><line x1="462" y1="168" x2="474" y2="152"/><line x1="486" y1="168" x2="498" y2="152"/></g>
+<circle cx="100" cy="160" r="7" fill="#9c9a92"/>
+<text x="100" y="118" text-anchor="middle" font-weight="600" fill="#1f1e1d">はずれ</text>
+<text x="100" y="136" text-anchor="middle" font-size="11.5" fill="#6b6a66">大半</text>
+<text x="100" y="186" text-anchor="middle" font-size="11.5" fill="#6b6a66">−300円</text>
+<rect x="262" y="154" width="96" height="12" rx="6" fill="#9c9a92" fill-opacity="0.35"/>
+<text x="310" y="118" text-anchor="middle" font-weight="600" fill="#1f1e1d">少額当せん</text>
+<text x="310" y="136" text-anchor="middle" font-size="11.5" fill="#6b6a66">時々</text>
+<text x="310" y="186" text-anchor="middle" font-size="11.5" fill="#6b6a66">ほぼ0〜数千円</text>
+<circle cx="640" cy="160" r="7" fill="#9c9a92"/>
+<text x="640" y="118" text-anchor="middle" font-weight="600" fill="#1f1e1d">高額当せん</text>
+<text x="640" y="136" text-anchor="middle" font-size="11.5" fill="#6b6a66">数百万〜数千万分の1</text>
+<text x="640" y="186" text-anchor="middle" font-size="11.5" fill="#6b6a66">+数千万〜数億円</text>
+<line x1="180" y1="96" x2="180" y2="204" stroke="#3b6fd4" stroke-width="1.25" stroke-dasharray="4 4"/>
+<path d="M180 152l8 8l-8 8l-8 -8z" fill="#3b6fd4"/>
+<text x="180" y="226" text-anchor="middle" font-weight="600" fill="#1f1e1d">期待値 約−160円</text>
+<text x="180" y="244" text-anchor="middle" font-size="11.5" fill="#6b6a66">1枚ではこの値にならない</text>
+</svg>
