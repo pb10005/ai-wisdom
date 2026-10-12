@@ -6,7 +6,7 @@
         --slug <slug> --tags <タグ1,タグ2> --source <ドキュメントの URL>
 
 - base64 をデコードし、export が申告したバイト数と UTF-8 として正しいかを検証する
-- 先頭の `# タイトル` と `Oct 7, 2026 · @名前` の署名行から title / date / collaborators を決める
+- 先頭の `# タイトル` と `Oct 7, 2026 · @名前`（または `· 文：名前`）の署名行から title / date / collaborators を決める
 - 署名行を除き、frontmatter を付けて essays/YYYY/YYYY-MM-DD-<slug>.md に書き出す
 - 図（`[embedded content: ...]`）は書き出しから落ちるので、残っている箇所を警告する
 """
@@ -21,7 +21,7 @@ from datetime import datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-BYLINE = re.compile(r"^([A-Z][a-z]{2} \d{1,2}, \d{4}) · @(\S+)\s*$")
+BYLINE = re.compile(r"^([A-Z][a-z]{2} \d{1,2}, \d{4}) · (?:@|文[：:]\s*)(\S+)\s*$")
 EMBED = re.compile(r"^&#91;embedded content: (.+?)\\?\]$")
 
 
@@ -65,6 +65,7 @@ def main() -> int:
 
     body_text = re.sub(r"\n{3,}", "\n\n", "\n".join(body)).strip("\n")
     tags = ", ".join(t.strip() for t in args.tags.split(",") if t.strip())
+    collaborators = author if author.lower() == "claude" else f"{author}, claude"
     title_yaml = title.replace('"', '\\"')
     out = ROOT / "essays" / date[:4] / f"{date}-{args.slug}.md"
     if out.exists() and not args.force:
@@ -76,7 +77,7 @@ def main() -> int:
         f'title: "{title_yaml}"\n'
         f"date: {date}\n"
         f"tags: [{tags}]\n"
-        f"collaborators: [{author}, claude]\n"
+        f"collaborators: [{collaborators}]\n"
         f"source: {args.source}\n"
         "extracted: false\n"
         "wisdom: []\n"
