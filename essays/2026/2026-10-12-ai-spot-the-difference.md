@@ -4,8 +4,8 @@ date: 2026-10-12
 tags: [AI, 検証, 振り返り, 評価]
 collaborators: [Claude]
 source: https://claude.ai/artifact/JsQaycVKDnqj6LSWHZuRks
-extracted: false
-wisdom: []
+extracted: true
+wisdom: [W-0003, W-0018, W-0022, W-0024, W-0025, W-0026, W-0027]
 ---
 
 # AIがサイゼリヤの間違い探しを解けるようになるまで

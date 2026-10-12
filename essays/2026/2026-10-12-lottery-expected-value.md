@@ -4,8 +4,8 @@ date: 2026-10-12
 tags: [統計, 期待値, 意思決定]
 collaborators: [Kohei, claude]
 source: https://claude.ai/artifact/Aguh5dKD8V8MkRc1Bhv8Gy
-extracted: false
-wisdom: []
+extracted: true
+wisdom: [W-0012, W-0023]
 ---
 
 # 宝くじ1枚の期待値はなぜ判断を誤らせるのか

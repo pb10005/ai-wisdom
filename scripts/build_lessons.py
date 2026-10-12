@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""lessons/*.md から、人が読むための教訓かるた（lessons/index.html）を生成する。
+"""lessons/*.md から、人が読むための教訓かるた（lessons/index.html）と一覧表（lessons/README.md）を生成する。
 
 使い方:
     python3 scripts/build_lessons.py          # lessons/index.html を書き出す
@@ -18,6 +18,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 LESSONS = ROOT / "lessons"
 OUT = LESSONS / "index.html"
+README = LESSONS / "README.md"
 REPO_URL = "https://github.com/pb10005/ai-wisdom/blob/main/"
 THEMES = [  # (ファイル名, 表示名) 並び順
     ("problem-solving.md", "問題解決"),
@@ -79,18 +80,30 @@ def render(items: list[dict]) -> str:
             f"<li>{html.escape(i['id'])} {html.escape(i['maxim'])}</li>" for i in items))
 
 
+def render_readme(items: list[dict]) -> str:
+    """lessons/README.md の一覧表（| テーマ | 番号 | 格言 |）を作り直した全文を返す。"""
+    text = README.read_text(encoding="utf-8")
+    files = {theme: name for name, theme in THEMES}
+    rows = "\n".join(f"| [{i['theme']}]({files[i['theme']]}) | {i['id']} | {i['maxim']} |" for i in items)
+    return re.sub(r"(\| テーマ \| 番号 \| 格言 \|\n\| --- \| --- \| --- \|\n)(?:\|.*\n)*", lambda m: m[1] + rows + "\n", text)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
-    out = render(load())
+    items = load()
+    out, readme = render(items), render_readme(items)
     if args.check:
-        if not OUT.exists() or OUT.read_text(encoding="utf-8") != out:
-            print("ERROR lessons/index.html が古い。python3 scripts/build_lessons.py を実行する", file=sys.stderr)
+        stale = [p.name for p, new in ((OUT, out), (README, readme))
+                 if not p.exists() or p.read_text(encoding="utf-8") != new]
+        if stale:
+            print(f"ERROR lessons/{', '.join(stale)} が古い。python3 scripts/build_lessons.py を実行する", file=sys.stderr)
             return 1
-        print("OK lessons/index.html は最新")
+        print("OK lessons/index.html と README.md は最新")
         return 0
     OUT.write_text(out, encoding="utf-8")
+    README.write_text(readme, encoding="utf-8")
     print(f"OK lessons/index.html を書き出した（{out.count(chr(10))} 行）")
     return 0
 
