@@ -4,8 +4,8 @@ date: 2026-11-13
 tags: [戦略, IPビジネス, ファン, 継続性]
 collaborators: [Kohei, claude]
 source: https://claude.ai/artifact/CUyw5exVZRmD5TJ79kbEYZ
-extracted: false
-wisdom: []
+extracted: true
+wisdom: [W-0028, W-0029, W-0030, W-0031, W-0032]
 ---
 
 # IPビジネスの次の一手：ちいかわとVIVANTで考える
